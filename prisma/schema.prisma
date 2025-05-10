@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  createdAt   DateTime    @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt   DateTime?
+  Category    Category?   @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+  OrderItem   OrderItem[]
+}
+
+model Address {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String
+  addressLine String
+  city        String
+  state       String
+  zip         String
+  isDefault   Boolean
+  createdAt   DateTime  @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt   DateTime?
+}
+
+model Author {
+  id        Int        @id @default(autoincrement())
+  name      String
+  slug      String
+  image     String
+  bio       String
+  createdAt DateTime   @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt DateTime?
+  BlogPost  BlogPost[]
+}
+
+model BlogCategory {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String
+  description String
+  createdAt   DateTime  @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt   DateTime?
+}
+
+model BlogPost {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String
+  content     String
+  author      Author    @relation(fields: [authorId], references: [id])
+  categories  String[]
+  mainImage   String
+  publishedAt String
+  isLatest    Boolean
+  createdAt   DateTime  @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt   DateTime?
+  authorId    Int
+}
+
+model Brand {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String
+  description String
+  image       String
+  website     String
+  createdAt   DateTime  @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt   DateTime?
+  isActive    Boolean
+  isFeatured  Boolean
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String
+  description String
+  image       String
+  createdAt   DateTime   @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt   DateTime?
+  isActive    Boolean
+  isFeatured  Boolean
+  parentId    Int?
+  parent      Category?  @relation("CategoryToParent", fields: [categoryId], references: [id])
+  children    Category[] @relation("CategoryToParent")
+  products    Product[]
+  categoryId  Int?
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  userId         String
+  orderNumber    String
+  status         String
+  total          Float
+  tax            Float
+  discount       Float
+  currency       String
+  paymentMethod  String
+  paymentStatus  String
+  shippingMethod String
+  shippingStatus String
+  trackingNumber String
+  createdAt      DateTime    @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt      DateTime?
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id        Int       @id @default(autoincrement())
+  order     Order     @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product   @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  price     Float
+  total     Float
+  createdAt DateTime  @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt DateTime?
+}
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  productId Int
+  userId    Int
+  rating    Int
+  comment   String
+  createdAt DateTime  @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt DateTime?
+}
+
+model Wishlist {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime  @default(dbgenerated("timezone('utc', now())")) @db.Timestamp(6)
+  updatedAt DateTime?
+}
