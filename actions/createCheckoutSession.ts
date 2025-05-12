@@ -1,8 +1,8 @@
 "use server";
 
+import { Address } from "@/lib/models";
 import stripe from "@/lib/stripe";
-import { Address } from "@/sanity.types";
-import { urlFor } from "@/sanity/lib/image";
+import { urlFor } from "@/lib/utils";
 import { CartItem } from "@/store";
 import Stripe from "stripe";
 
@@ -16,13 +16,11 @@ export interface Metadata {
 
 export interface GroupedCartItems {
   product: CartItem["product"];
+  // product: Product;
   quantity: number;
 }
 
-export async function createCheckoutSession(
-  items: GroupedCartItems[],
-  metadata: Metadata
-) {
+export async function createCheckoutSession(items: GroupedCartItems[], metadata: Metadata) {
   try {
     // Retrieve existing customer or create a new one
     const customers = await stripe.customers.list({
@@ -45,21 +43,19 @@ export async function createCheckoutSession(
       invoice_creation: {
         enabled: true,
       },
-      success_url: `${
-        process.env.NEXT_PUBLIC_BASE_URL
-      }/success?session_id={CHECKOUT_SESSION_ID}&orderNumber=${metadata.orderNumber}`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}&orderNumber=${metadata.orderNumber}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
       line_items: items?.map((item) => ({
         price_data: {
           currency: "USD",
-          unit_amount: Math.round(item?.product?.price! * 100),
+          unit_amount: Math.round(item.product.price! * 100),
           product_data: {
             name: item?.product?.name || "Unknown Product",
             description: item?.product?.description,
-            metadata: { id: item?.product?._id },
+            metadata: { id: item?.product?.id },
             images:
               item?.product?.images && item?.product?.images?.length > 0
-                ? [urlFor(item?.product?.images[0]).url()]
+                ? [urlFor(item.product.images[0].getUrl())]
                 : undefined,
           },
         },

@@ -4,9 +4,7 @@ import HomeCategories from "@/components/HomeCategories";
 import LatestBlog from "@/components/LatestBlog";
 import ProductGrid from "@/components/ProductGrid";
 import ShopByBrands from "@/components/ShopByBrands";
-import { getCategories } from "@/sanity/queries";
-
-import React from "react";
+import { getCategories } from "@/lib/repos/category-repo";
 
 const Home = async () => {
   const categories = await getCategories(6);
