@@ -34,17 +34,17 @@ export const createCategorySchema = z.object({
     .optional(),
 
   // isActive: boolean;
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 
   // isFeatured: boolean;
-  isFeatured: z.boolean().default(false),
+  isFeatured: z.boolean(),
 
   // image: string;
   image: z.string(),
 });
 
 export const updateCategorySchema = createCategorySchema.extend({
-  id: z.number(),
+  id: z.number().optional().nullable(),
 });
 
 export type createCategoryPayload = z.infer<typeof createCategorySchema>;

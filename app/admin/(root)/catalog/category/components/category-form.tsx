@@ -1,35 +1,28 @@
+import { Category, DefaultCategory } from "@/lib/models";
+import { createCategoryPayload, createCategorySchema, updateCategorySchema } from "@/lib/models/admin/catalog/category";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
-// Define the schema using Zod
-const createCategorySchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "Name must be at least 3 characters long" })
-    .max(50, { message: "Name must be at most 50 characters long" }),
-  slug: z
-    .string()
-    .min(3, { message: "Slug must be at least 3 characters long" })
-    .max(50, { message: "Slug must be at most 50 characters long" }),
-  description: z.string().max(5000, { message: "Description must be at most 5000 characters long" }).optional(),
-  isActive: z.boolean().default(true),
-  isFeatured: z.boolean().default(false),
-});
-
-type CreateCategoryFormValues = z.infer<typeof createCategorySchema>;
-
-const CategoryForm: React.FC = () => {
+const CategoryForm: React.FC = ({
+  type,
+  category,
+  categoryId,
+}: {
+  type: "Create" | "Update";
+  category?: Category;
+  categoryId?: number;
+}) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreateCategoryFormValues>({
-    resolver: zodResolver(createCategorySchema),
+  } = useForm<createCategoryPayload>({
+    resolver: type === "Update" ? zodResolver(updateCategorySchema) : zodResolver(createCategorySchema),
+    defaultValues: category && type === "Update" ? category : DefaultCategory,
   });
 
-  const onSubmit = (data: CreateCategoryFormValues) => {
+  const onSubmit = (data: createCategoryPayload) => {
     console.log("Form Data:", data);
   };
 

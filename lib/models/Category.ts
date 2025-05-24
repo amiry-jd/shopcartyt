@@ -14,5 +14,22 @@ export interface Category {
   products: Product[];
   productsCount: number;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt: Date | null | undefined;
 }
+
+export const DefaultCategory: Category = {
+  children: [],
+  createdAt: new Date(),
+  description: "",
+  id: 0,
+  image: "",
+  isActive: true,
+  isFeatured: false,
+  name: "",
+  parent: undefined,
+  parentId: undefined,
+  products: [],
+  productsCount: 0,
+  slug: "",
+  updatedAt: undefined,
+};
